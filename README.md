@@ -1,6 +1,6 @@
 # RF
 
-- [ ] O usuário deve poder criar uma conta;
+- [x] O usuário deve poder criar uma conta;
 - [ ] O usuário deve poder fazer login;
 - [x] O usuário deve poder registrar uma refeição;
 - [x] O usuário deve poder listar todas as refeições;
