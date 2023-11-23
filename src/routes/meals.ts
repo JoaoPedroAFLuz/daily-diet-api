@@ -18,12 +18,18 @@ export async function mealsRoutes(app: FastifyInstance) {
 
     await knex('meals').insert({
       id: randomUUID(),
-      name: name,
-      description: description,
-      dateTime: dateTime,
-      isDiet: isDiet,
+      name,
+      description,
+      dateTime,
+      isDiet,
     });
 
     return res.status(201).send();
+  });
+
+  app.get('/', async () => {
+    const meals = await knex('meals').select('*');
+
+    return { meals };
   });
 }

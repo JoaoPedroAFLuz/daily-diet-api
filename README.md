@@ -3,7 +3,7 @@
 - [ ] O usuário deve poder criar uma conta;
 - [ ] O usuário deve poder fazer login;
 - [x] O usuário deve poder registrar uma refeição;
-- [ ] O usuário deve poder listar todas as refeições;
+- [x] O usuário deve poder listar todas as refeições;
 - [ ] O usuário deve poder visualizar uma única refeição;
 - [ ] O usuário deve poder editar uma refeição;
 - [ ] O usuário deve poder excluir uma refeição;
