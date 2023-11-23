@@ -16,4 +16,4 @@
 # RN
 
 - [ ] Deve ser possível identificar o usuário entre as requisições;
-- [ ] O usuário deve poder visualizar apenas refeições que ele criou;
+- [x] O usuário deve poder visualizar apenas refeições que ele criou;
