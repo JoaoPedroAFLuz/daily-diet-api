@@ -32,4 +32,20 @@ export async function mealsRoutes(app: FastifyInstance) {
 
     return { meals };
   });
+
+  app.get('/:id', async (req, res) => {
+    const getMealParamsSchema = z.object({
+      id: z.string().uuid(),
+    });
+
+    const { id } = getMealParamsSchema.parse(req.params);
+
+    const meal = await knex('meals').where({ id }).first();
+
+    if (!meal) {
+      return res.status(404).send();
+    }
+
+    return { meal };
+  });
 }
