@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { knex } from '../database';
 import { Meals } from '../models/Meals';
+import { checkSessionId } from '../middlewares/check-session-id';
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post('/', async (request, reply) => {
@@ -40,45 +41,75 @@ export async function mealsRoutes(app: FastifyInstance) {
     return reply.status(201).send();
   });
 
-  app.get('/', async () => {
-    const meals = await knex('meals').select('*');
+  app.get(
+    '/',
+    {
+      preHandler: [checkSessionId],
+    },
+    async (request, reply) => {
+      const { sessionId } = request.cookies;
 
-    return { meals };
-  });
+      const meals = await knex('meals')
+        .where({ session_id: sessionId })
+        .select('*');
 
-  app.get('/:id', async (request, reply) => {
-    const getMealParamsSchema = z.object({
-      id: z.string().uuid(),
-    });
+      return reply.send({ meals });
+    },
+  );
 
-    const { id } = getMealParamsSchema.parse(request.params);
+  app.get(
+    '/:id',
+    {
+      preHandler: [checkSessionId],
+    },
+    async (request, reply) => {
+      const { sessionId } = request.cookies;
 
-    const meal = await knex('meals').where({ id }).first();
+      const getMealParamsSchema = z.object({
+        id: z.string().uuid(),
+      });
 
-    if (!meal) {
-      return reply.status(404).send();
-    }
+      const { id } = getMealParamsSchema.parse(request.params);
 
-    return { meal };
-  });
+      const meal = await knex('meals')
+        .where({ id, session_id: sessionId })
+        .first();
 
-  app.get('/metrics', async () => {
-    const meals: Meals[] = await knex('meals').select('*');
+      if (!meal) {
+        return reply.status(404).send();
+      }
 
-    const mealsOnDiet = meals.filter((meals) => !!meals.isInDiet);
-    const mealsOffDiet = meals.filter((meals) => !meals.isInDiet);
+      return { meal };
+    },
+  );
 
-    const bestSequence = calculateConsecutiveMeals(meals);
+  app.get(
+    '/metrics',
+    {
+      preHandler: [checkSessionId],
+    },
+    async (request, reply) => {
+      const { sessionId } = request.cookies;
 
-    const metrics = {
-      total: meals.length,
-      totalMealsOnDiet: mealsOnDiet.length,
-      totalMealsOffDiet: mealsOffDiet.length,
-      bestSequence,
-    };
+      const meals: Meals[] = await knex('meals')
+        .where({ session_id: sessionId })
+        .select('*');
 
-    return { metrics };
-  });
+      const mealsOnDiet = meals.filter((meals) => !!meals.isInDiet);
+      const mealsOffDiet = meals.filter((meals) => !meals.isInDiet);
+
+      const bestSequence = calculateConsecutiveMeals(meals);
+
+      const metrics = {
+        total: meals.length,
+        totalMealsOnDiet: mealsOnDiet.length,
+        totalMealsOffDiet: mealsOffDiet.length,
+        bestSequence,
+      };
+
+      return reply.send({ metrics });
+    },
+  );
 
   function calculateConsecutiveMeals(meals: Meals[]) {
     let currentCount = 0;
