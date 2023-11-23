@@ -4,5 +4,6 @@ export class Meals {
   description: string;
   dateTime: string;
   isInDiet: boolean;
-  created_at: string;
+  created_at?: string;
+  session_id?: string;
 }

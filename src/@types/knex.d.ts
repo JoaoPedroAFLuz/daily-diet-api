@@ -10,6 +10,7 @@ declare module 'knex/types/tables' {
       dateTime: string;
       isInDiet: boolean;
       created_ad: string;
+      session_id: string;
     };
   }
 }

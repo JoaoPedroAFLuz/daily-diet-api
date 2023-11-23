@@ -6,7 +6,7 @@ import { knex } from '../database';
 import { Meals } from '../models/Meals';
 
 export async function mealsRoutes(app: FastifyInstance) {
-  app.post('/', async (req, res) => {
+  app.post('/', async (request, reply) => {
     const createTransactionBodySchema = z.object({
       name: z.string(),
       description: z.string(),
@@ -15,7 +15,18 @@ export async function mealsRoutes(app: FastifyInstance) {
     });
 
     const { name, description, dateTime, isInDiet } =
-      createTransactionBodySchema.parse(req.body);
+      createTransactionBodySchema.parse(request.body);
+
+    let sessionId = request.cookies.sessionId;
+
+    if (!sessionId) {
+      sessionId = randomUUID();
+
+      reply.cookie('sessionId', sessionId, {
+        path: '/',
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      });
+    }
 
     await knex('meals').insert({
       id: randomUUID(),
@@ -23,9 +34,10 @@ export async function mealsRoutes(app: FastifyInstance) {
       description,
       dateTime,
       isInDiet,
+      session_id: sessionId,
     });
 
-    return res.status(201).send();
+    return reply.status(201).send();
   });
 
   app.get('/', async () => {
@@ -34,17 +46,17 @@ export async function mealsRoutes(app: FastifyInstance) {
     return { meals };
   });
 
-  app.get('/:id', async (req, res) => {
+  app.get('/:id', async (request, reply) => {
     const getMealParamsSchema = z.object({
       id: z.string().uuid(),
     });
 
-    const { id } = getMealParamsSchema.parse(req.params);
+    const { id } = getMealParamsSchema.parse(request.params);
 
     const meal = await knex('meals').where({ id }).first();
 
     if (!meal) {
-      return res.status(404).send();
+      return reply.status(404).send();
     }
 
     return { meal };
