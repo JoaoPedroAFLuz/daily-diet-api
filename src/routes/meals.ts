@@ -3,6 +3,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 import { knex } from '../database';
+import { Meals } from '../models/Meals';
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post('/', async (req, res) => {
@@ -10,10 +11,10 @@ export async function mealsRoutes(app: FastifyInstance) {
       name: z.string(),
       description: z.string(),
       dateTime: z.string(),
-      isDiet: z.boolean(),
+      isInDiet: z.boolean(),
     });
 
-    const { name, description, dateTime, isDiet } =
+    const { name, description, dateTime, isInDiet } =
       createTransactionBodySchema.parse(req.body);
 
     await knex('meals').insert({
@@ -21,7 +22,7 @@ export async function mealsRoutes(app: FastifyInstance) {
       name,
       description,
       dateTime,
-      isDiet,
+      isInDiet,
     });
 
     return res.status(201).send();
@@ -48,4 +49,38 @@ export async function mealsRoutes(app: FastifyInstance) {
 
     return { meal };
   });
+
+  app.get('/metrics', async () => {
+    const meals: Meals[] = await knex('meals').select('*');
+
+    const mealsOnDiet = meals.filter((meals) => !!meals.isInDiet);
+    const mealsOffDiet = meals.filter((meals) => !meals.isInDiet);
+
+    const bestSequence = calculateConsecutiveMeals(meals);
+
+    const metrics = {
+      total: meals.length,
+      totalMealsOnDiet: mealsOnDiet.length,
+      totalMealsOffDiet: mealsOffDiet.length,
+      bestSequence,
+    };
+
+    return { metrics };
+  });
+
+  function calculateConsecutiveMeals(meals: Meals[]) {
+    let currentCount = 0;
+    let maxCount = 0;
+
+    for (const meal of meals) {
+      if (meal.isInDiet) {
+        currentCount++;
+        maxCount = Math.max(maxCount, currentCount);
+      } else {
+        currentCount = 0;
+      }
+    }
+
+    return maxCount;
+  }
 }

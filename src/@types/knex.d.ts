@@ -8,7 +8,7 @@ declare module 'knex/types/tables' {
       name: string;
       description: string;
       dateTime: string;
-      isDiet: boolean;
+      isInDiet: boolean;
       created_ad: string;
     };
   }
