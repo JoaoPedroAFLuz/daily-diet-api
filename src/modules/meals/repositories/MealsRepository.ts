@@ -32,6 +32,10 @@ class MealsRepository implements IMealsRepository {
       .where({ id: mealId, user_id: userId })
       .first();
   }
+
+  async delete({ mealId, userId }: { mealId: string; userId: string }) {
+    await knex<Meal>('meals').where({ id: mealId, user_id: userId }).delete();
+  }
 }
 
 export const mealsRepository = new MealsRepository();

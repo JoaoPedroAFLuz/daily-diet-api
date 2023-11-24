@@ -7,7 +7,10 @@ interface FindMealByIdParams {
   userId: string;
 }
 
-export async function findMealById({ mealId, userId }: FindMealByIdParams) {
+export async function findMealByIdService({
+  mealId,
+  userId,
+}: FindMealByIdParams) {
   const meal = await mealsRepository.findById({ mealId, userId });
 
   if (!meal) {

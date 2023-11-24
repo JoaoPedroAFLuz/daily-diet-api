@@ -6,7 +6,7 @@
 - [x] O usuário deve poder listar todas as refeições;
 - [x] O usuário deve poder visualizar uma única refeição;
 - [ ] O usuário deve poder editar uma refeição;
-- [ ] O usuário deve poder excluir uma refeição;
+- [x] O usuário deve poder excluir uma refeição;
 - [x] O usuário deve poder visualizar suas métricas:
   - [x] Quantidade total de refeições registradas;
   - [x] Quantidade total de refeições dentro da dieta;

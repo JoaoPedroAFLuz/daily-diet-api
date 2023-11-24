@@ -6,7 +6,7 @@ interface FindMetricsParams {
   userId: string;
 }
 
-export async function findMealMetrics({ userId }: FindMetricsParams) {
+export async function findMealMetricsService({ userId }: FindMetricsParams) {
   const meals = await mealsRepository.findAll({ userId });
 
   const mealsOnDiet = meals.filter((meals) => !!meals.isInDiet);

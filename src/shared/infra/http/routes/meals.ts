@@ -1,12 +1,13 @@
 import { FastifyInstance } from 'fastify';
-import { z } from 'zod';
 
 import { mealsRepository } from 'modules/meals/repositories/MealsRepository';
-import { findAllMeals } from 'modules/meals/services/find-all-meals';
-import { findMealById } from 'modules/meals/services/find-meal-by-id';
-import { findMealMetrics } from 'modules/meals/services/find-metrics';
+import { deleteMealService } from 'modules/meals/services/delete-meal';
+import { findAllMealsService } from 'modules/meals/services/find-all-meals';
+import { findMealByIdService } from 'modules/meals/services/find-meal-by-id';
+import { findMealMetricsService } from 'modules/meals/services/find-metrics';
 import { checkAuthentication } from '../middlewares/check-authentication';
 import { createMealSchema } from '../schemas/create-meal-schema';
+import { getMealParamsSchema } from '../schemas/get-meal-schema';
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post(
@@ -41,7 +42,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { id: userId } = request.user;
 
-      const meals = await findAllMeals({ userId });
+      const meals = await findAllMealsService({ userId });
 
       return reply.send({ meals });
     },
@@ -55,13 +56,9 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { id: userId } = request.user;
 
-      const getMealParamsSchema = z.object({
-        id: z.string().uuid(),
-      });
-
       const { id: mealId } = getMealParamsSchema.parse(request.params);
 
-      const meal = await findMealById({ mealId, userId });
+      const meal = await findMealByIdService({ mealId, userId });
 
       return reply.send({ meal });
     },
@@ -75,9 +72,25 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { id: userId } = request.user;
 
-      const mealMetrics = await findMealMetrics({ userId });
+      const mealMetrics = await findMealMetricsService({ userId });
 
       return reply.send({ mealMetrics });
+    },
+  );
+
+  app.delete(
+    '/:id',
+    {
+      preHandler: [checkAuthentication],
+    },
+    async (request, reply) => {
+      const { id: userId } = request.user;
+
+      const { id: mealId } = getMealParamsSchema.parse(request.params);
+
+      await deleteMealService({ mealId, userId });
+
+      return reply.status(204).send();
     },
   );
 }

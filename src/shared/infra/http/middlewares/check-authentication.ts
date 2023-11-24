@@ -22,7 +22,7 @@ export async function checkAuthentication(request: FastifyRequest) {
       sub: string;
     };
 
-    const user = await usersRepository.findById(userId);
+    const user = await usersRepository.findById({ userId });
 
     if (!user) {
       throw new ApiError({ statusCode: 404, message: 'User not found' });

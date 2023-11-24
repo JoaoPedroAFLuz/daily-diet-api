@@ -18,8 +18,8 @@ class UsersRepository implements IUsersRepository {
     return user;
   }
 
-  async findById({ id }: { id: string }) {
-    return knex('users').where({ id }).first();
+  async findById({ userId }: { userId: string }) {
+    return knex('users').where({ id: userId }).first();
   }
 
   async findByEmail({ email }: { email: string }) {
