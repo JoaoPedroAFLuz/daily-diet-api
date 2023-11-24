@@ -1,13 +1,12 @@
-import { randomUUID } from 'crypto';
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
-import { knex } from 'database';
+import { MealMetricsDTO, createMealSchema } from 'dtos/meal.dto';
 import { ApiError } from 'errors/api-error';
 import { MealMapper } from 'mappers/meal-mapper';
 import { checkAuthentication } from 'middlewares/check-authentication';
 import { Meal } from 'models/Meal';
-import { MealMetricsDTO } from 'dtos/meal.dto';
+import { mealsRepository } from 'repositories/MealsRepository';
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post(
@@ -16,32 +15,14 @@ export async function mealsRoutes(app: FastifyInstance) {
       preHandler: [checkAuthentication],
     },
     async (request, reply) => {
-      const { id: user_id } = request.user;
+      const { id: userId } = request.user;
 
-      const createTransactionBodySchema = z.object({
-        name: z.string(),
-        description: z.string(),
-        dateTime: z.string(),
-        isInDiet: z.boolean(),
-      });
+      const { name, description, dateTime, isInDiet } = createMealSchema.parse(
+        request.body,
+      );
 
-      const { name, description, dateTime, isInDiet } =
-        createTransactionBodySchema.parse(request.body);
-
-      let sessionId = request.cookies.sessionId;
-
-      if (!sessionId) {
-        sessionId = randomUUID();
-
-        reply.cookie('sessionId', sessionId, {
-          path: '/',
-          maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-        });
-      }
-
-      await knex('meals').insert({
-        id: randomUUID(),
-        user_id,
+      await mealsRepository.create({
+        userId,
         name,
         description,
         dateTime,
@@ -58,9 +39,9 @@ export async function mealsRoutes(app: FastifyInstance) {
       preHandler: [checkAuthentication],
     },
     async (request, reply) => {
-      const { id: user_id } = request.user;
+      const { id: userId } = request.user;
 
-      const meals = await knex<Meal>('meals').where({ user_id }).select('*');
+      const meals = await mealsRepository.findAll(userId);
 
       const mealsDto = meals.map(MealMapper.toDTO);
 
@@ -74,15 +55,15 @@ export async function mealsRoutes(app: FastifyInstance) {
       preHandler: [checkAuthentication],
     },
     async (request, reply) => {
-      const { id: user_id } = request.user;
+      const { id: userId } = request.user;
 
       const getMealParamsSchema = z.object({
         id: z.string().uuid(),
       });
 
-      const { id } = getMealParamsSchema.parse(request.params);
+      const { id: mealId } = getMealParamsSchema.parse(request.params);
 
-      const meal = await knex<Meal>('meals').where({ id, user_id }).first();
+      const meal = await mealsRepository.findById(mealId, userId);
 
       if (!meal) {
         throw new ApiError({ statusCode: 404, message: 'Meal not found' });
@@ -100,9 +81,9 @@ export async function mealsRoutes(app: FastifyInstance) {
       preHandler: [checkAuthentication],
     },
     async (request, reply) => {
-      const { id: user_id } = request.user;
+      const { id: userId } = request.user;
 
-      const meals = await knex<Meal>('meals').where({ user_id }).select('*');
+      const meals = await mealsRepository.findAll(userId);
 
       const mealsOnDiet = meals.filter((meals) => !!meals.isInDiet);
       const mealsOffDiet = meals.filter((meals) => !meals.isInDiet);

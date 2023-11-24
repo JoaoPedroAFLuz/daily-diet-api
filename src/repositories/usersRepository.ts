@@ -1,6 +1,8 @@
 import { knex } from 'database';
 
-class UsersRepository {
+import { IUsersRepository } from './IUsersRepository';
+
+class UsersRepository implements IUsersRepository {
   async findById(id: string) {
     return knex('users').where({ id }).first();
   }

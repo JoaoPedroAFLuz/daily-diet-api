@@ -3,7 +3,7 @@ import { verify } from 'jsonwebtoken';
 
 import { env } from 'env';
 import { ApiError } from 'errors/api-error';
-import { usersRepository } from 'repositories/usersRepository';
+import { usersRepository } from 'repositories/UsersRepository';
 
 export async function checkAuthentication(request: FastifyRequest) {
   const authHeader = request.headers.authorization;
