@@ -4,10 +4,10 @@ import { sign } from 'jsonwebtoken';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 
-import auth from '../config/auth';
-import { knex } from '../database';
-import { env } from '../env';
-import { ApiError } from '../errors/api-error';
+import auth from 'config/auth';
+import { knex } from 'database';
+import { env } from 'env';
+import { ApiError } from 'errors/api-error';
 
 export async function authRoutes(app: FastifyInstance) {
   app.post('/sign-up', async (request, reply) => {
@@ -38,12 +38,9 @@ export async function authRoutes(app: FastifyInstance) {
       })
       .returning('*');
 
-    const access_token = sign({}, env.JWT_SECRET, {
-      subject: user.id,
-      expiresIn: auth.expiresIn,
-    });
+    const accessToken = generateAccessToken(user.id);
 
-    return reply.status(201).send({ access_token });
+    return reply.status(201).send({ accessToken });
   });
 
   app.post('/log-in', async (request, reply) => {
@@ -68,13 +65,17 @@ export async function authRoutes(app: FastifyInstance) {
       throw new ApiError({ message: 'Credentials invalid' });
     }
 
-    const access_token = sign({}, env.JWT_SECRET, {
-      subject: user.id,
-      expiresIn: auth.expiresIn,
-    });
+    const accessToken = generateAccessToken(user.id);
 
     return reply.status(200).send({
-      access_token,
+      accessToken,
     });
   });
+
+  function generateAccessToken(userId: string) {
+    return sign({}, env.JWT_SECRET, {
+      subject: userId,
+      expiresIn: auth.expiresIn,
+    });
+  }
 }

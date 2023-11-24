@@ -1,7 +1,7 @@
 # RF
 
 - [x] O usuário deve poder criar uma conta;
-- [ ] O usuário deve poder fazer login;
+- [x] O usuário deve poder fazer login;
 - [x] O usuário deve poder registrar uma refeição;
 - [x] O usuário deve poder listar todas as refeições;
 - [x] O usuário deve poder visualizar uma única refeição;
@@ -16,4 +16,4 @@
 # RN
 
 - [ ] Deve ser possível identificar o usuário entre as requisições;
-- [x] O usuário deve poder visualizar apenas refeições que ele criou;
+- [ ] O usuário deve poder visualizar apenas refeições que ele criou;

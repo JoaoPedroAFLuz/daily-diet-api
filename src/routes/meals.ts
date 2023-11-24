@@ -2,57 +2,59 @@ import { randomUUID } from 'crypto';
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
-import { knex } from '../database';
-import { Meal } from '../models/Meal';
-import { checkSessionId } from '../middlewares/check-session-id';
-import { ApiError } from '../errors/api-error';
+import { knex } from 'database';
+import { ApiError } from 'errors/api-error';
+import { checkAuthentication } from 'middlewares/check-authentication';
+import { Meal } from 'models/Meal';
 
 export async function mealsRoutes(app: FastifyInstance) {
-  app.post('/', async (request, reply) => {
-    const createTransactionBodySchema = z.object({
-      name: z.string(),
-      description: z.string(),
-      dateTime: z.string(),
-      isInDiet: z.boolean(),
-    });
-
-    const { name, description, dateTime, isInDiet } =
-      createTransactionBodySchema.parse(request.body);
-
-    let sessionId = request.cookies.sessionId;
-
-    if (!sessionId) {
-      sessionId = randomUUID();
-
-      reply.cookie('sessionId', sessionId, {
-        path: '/',
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+  app.post(
+    '/',
+    {
+      preHandler: [checkAuthentication],
+    },
+    async (request, reply) => {
+      const createTransactionBodySchema = z.object({
+        name: z.string(),
+        description: z.string(),
+        dateTime: z.string(),
+        isInDiet: z.boolean(),
       });
-    }
 
-    await knex('meals').insert({
-      id: randomUUID(),
-      name,
-      description,
-      dateTime,
-      isInDiet,
-      session_id: sessionId,
-    });
+      const { name, description, dateTime, isInDiet } =
+        createTransactionBodySchema.parse(request.body);
 
-    return reply.status(201).send();
-  });
+      let sessionId = request.cookies.sessionId;
+
+      if (!sessionId) {
+        sessionId = randomUUID();
+
+        reply.cookie('sessionId', sessionId, {
+          path: '/',
+          maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+        });
+      }
+
+      await knex('meals').insert({
+        id: randomUUID(),
+        name,
+        description,
+        dateTime,
+        isInDiet,
+        session_id: sessionId,
+      });
+
+      return reply.status(201).send();
+    },
+  );
 
   app.get(
     '/',
     {
-      preHandler: [checkSessionId],
+      preHandler: [checkAuthentication],
     },
     async (request, reply) => {
-      const { sessionId } = request.cookies;
-
-      const meals = await knex('meals')
-        .where({ session_id: sessionId })
-        .select('*');
+      const meals = await knex('meals').select('*');
 
       return reply.send({ meals });
     },
@@ -61,20 +63,16 @@ export async function mealsRoutes(app: FastifyInstance) {
   app.get(
     '/:id',
     {
-      preHandler: [checkSessionId],
+      preHandler: [checkAuthentication],
     },
     async (request, reply) => {
-      const { sessionId } = request.cookies;
-
       const getMealParamsSchema = z.object({
         id: z.string().uuid(),
       });
 
       const { id } = getMealParamsSchema.parse(request.params);
 
-      const meal = await knex('meals')
-        .where({ id, session_id: sessionId })
-        .first();
+      const meal = await knex('meals').where({ id }).first();
 
       if (!meal) {
         throw new ApiError({ statusCode: 404, message: 'Meal not found' });
@@ -87,14 +85,10 @@ export async function mealsRoutes(app: FastifyInstance) {
   app.get(
     '/metrics',
     {
-      preHandler: [checkSessionId],
+      preHandler: [checkAuthentication],
     },
     async (request, reply) => {
-      const { sessionId } = request.cookies;
-
-      const meals: Meal[] = await knex('meals')
-        .where({ session_id: sessionId })
-        .select('*');
+      const meals: Meal[] = await knex('meals').select('*');
 
       const mealsOnDiet = meals.filter((meals) => !!meals.isInDiet);
       const mealsOffDiet = meals.filter((meals) => !meals.isInDiet);

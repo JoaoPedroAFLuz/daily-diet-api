@@ -1,7 +1,7 @@
 import { FastifyError, FastifyInstance, FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
 
-import { ApiError } from '../errors/api-error';
+import { ApiError } from 'errors/api-error';
 
 export function errorHandler(app: FastifyInstance) {
   app.setErrorHandler((error: FastifyError, _, reply: FastifyReply) => {
@@ -16,6 +16,10 @@ export function errorHandler(app: FastifyInstance) {
         message: error.format(),
       });
     }
+
+    console.error(`Code: ${error.code}`);
+    console.error(`Name: ${error.name}`);
+    console.error(`Message: ${error.message}`);
 
     return reply.status(500).send({ message: 'Internal Server Error' });
   });
