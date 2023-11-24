@@ -3,8 +3,9 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 import { knex } from '../database';
-import { Meals } from '../models/Meals';
+import { Meal } from '../models/Meal';
 import { checkSessionId } from '../middlewares/check-session-id';
+import { ApiError } from '../errors/api-error';
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post('/', async (request, reply) => {
@@ -76,10 +77,10 @@ export async function mealsRoutes(app: FastifyInstance) {
         .first();
 
       if (!meal) {
-        return reply.status(404).send();
+        throw new ApiError({ statusCode: 404, message: 'Meal not found' });
       }
 
-      return { meal };
+      return reply.send({ meal });
     },
   );
 
@@ -91,7 +92,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { sessionId } = request.cookies;
 
-      const meals: Meals[] = await knex('meals')
+      const meals: Meal[] = await knex('meals')
         .where({ session_id: sessionId })
         .select('*');
 
@@ -111,7 +112,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
   );
 
-  function calculateConsecutiveMeals(meals: Meals[]) {
+  function calculateConsecutiveMeals(meals: Meal[]) {
     let currentCount = 0;
     let maxCount = 0;
 

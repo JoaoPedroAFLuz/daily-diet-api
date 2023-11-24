@@ -7,6 +7,7 @@ import { z } from 'zod';
 import auth from '../config/auth';
 import { knex } from '../database';
 import { env } from '../env';
+import { ApiError } from '../errors/api-error';
 
 export async function authRoutes(app: FastifyInstance) {
   app.post('/sign-up', async (request, reply) => {
@@ -23,7 +24,7 @@ export async function authRoutes(app: FastifyInstance) {
     const emailAlreadyInUse = await knex('users').where({ email }).first();
 
     if (emailAlreadyInUse) {
-      return reply.status(409).send({ message: 'Email already in use' });
+      throw new ApiError({ statusCode: 409, message: 'Email already in use' });
     }
 
     const hashedPassword = await hash(password, 12);
@@ -58,13 +59,13 @@ export async function authRoutes(app: FastifyInstance) {
     const user = await knex('users').where({ email }).first();
 
     if (!user) {
-      return reply.status(400).send({ message: 'Credentials invalid' });
+      throw new ApiError({ message: 'Credentials invalid' });
     }
 
     const passwordMatch = await compare(password, user.password);
 
     if (!passwordMatch) {
-      return reply.status(400).send({ message: 'Credentials invalid' });
+      throw new ApiError({ message: 'Credentials invalid' });
     }
 
     const access_token = sign({}, env.JWT_SECRET, {
