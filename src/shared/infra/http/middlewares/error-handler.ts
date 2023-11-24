@@ -1,7 +1,7 @@
 import { FastifyError, FastifyInstance, FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
 
-import { ApiError } from 'errors/api-error';
+import { ApiError } from 'shared/errors/api-error';
 
 export function errorHandler(app: FastifyInstance) {
   app.setErrorHandler((error: FastifyError, _, reply: FastifyReply) => {

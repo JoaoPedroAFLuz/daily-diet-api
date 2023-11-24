@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 
-import { knex } from 'database';
-import { CreateMealDTO } from 'dtos/meal.dto';
-import { Meal } from 'models/Meal';
+import { knex } from 'shared/infra/knex/database';
+import { CreateMealDTO } from 'modules/meals/dtos/meal.dto';
+import { Meal } from 'modules/meals/models/Meal';
 import { IMealsRepository } from './IMealsRepository';
 
 class MealsRepository implements IMealsRepository {
@@ -23,11 +23,11 @@ class MealsRepository implements IMealsRepository {
     });
   }
 
-  async findAll(userId: string) {
+  async findAll({ userId }: { userId: string }) {
     return await knex<Meal>('meals').where({ user_id: userId }).select('*');
   }
 
-  async findById(mealId: string, userId: string) {
+  async findById({ mealId, userId }: { mealId: string; userId: string }) {
     return await knex<Meal>('meals')
       .where({ id: mealId, user_id: userId })
       .first();

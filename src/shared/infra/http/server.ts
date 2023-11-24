@@ -1,9 +1,9 @@
 import fastifyCookie from '@fastify/cookie';
 import fastify from 'fastify';
 
-import { env } from './env';
+import { env } from 'config/env';
+import { routes } from 'shared/infra/http/routes';
 import { errorHandler } from './middlewares/error-handler';
-import { routes } from './routes';
 
 const app = fastify();
 

@@ -1,5 +1,5 @@
-import { MealDTO } from 'dtos/meal.dto';
-import { Meal } from 'models/Meal';
+import { MealDTO } from 'modules/meals/dtos/meal.dto';
+import { Meal } from 'modules/meals/models/Meal';
 
 export class MealMapper {
   static toDTO(meal: Meal): MealDTO {

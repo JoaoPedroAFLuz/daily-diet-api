@@ -1,9 +1,9 @@
 import { FastifyRequest } from 'fastify';
 import { verify } from 'jsonwebtoken';
 
-import { env } from 'env';
-import { ApiError } from 'errors/api-error';
-import { usersRepository } from 'repositories/UsersRepository';
+import { env } from 'config/env';
+import { ApiError } from 'shared/errors/api-error';
+import { usersRepository } from 'modules/accounts/repositories/UsersRepository';
 
 export async function checkAuthentication(request: FastifyRequest) {
   const authHeader = request.headers.authorization;
