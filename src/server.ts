@@ -2,18 +2,15 @@ import fastifyCookie from '@fastify/cookie';
 import fastify from 'fastify';
 
 import { env } from './env';
-import { mealsRoutes } from './routes/meals';
-import { authRoutes } from './routes/auth';
+import { errorHandler } from './middlewares/error-handler';
+import { routes } from './routes';
 
 const app = fastify();
 
 app.register(fastifyCookie);
-app.register(authRoutes, {
-  prefix: '/auth',
-});
-app.register(mealsRoutes, {
-  prefix: '/meals',
-});
+app.register(routes);
+
+errorHandler(app);
 
 app
   .listen({

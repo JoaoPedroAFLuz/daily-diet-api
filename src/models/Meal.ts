@@ -1,4 +1,4 @@
-export class Meals {
+export class Meal {
   id: string;
   name: string;
   description: string;
