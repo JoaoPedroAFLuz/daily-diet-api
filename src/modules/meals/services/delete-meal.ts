@@ -1,12 +1,15 @@
 import { ApiError } from 'shared/errors/api-error';
 import { mealsRepository } from '../repositories/MealsRepository';
 
-interface DeleteMealParams {
+interface DeleteMealServiceParams {
   mealId: string;
   userId: string;
 }
 
-export async function deleteMealService({ mealId, userId }: DeleteMealParams) {
+export async function deleteMealService({
+  mealId,
+  userId,
+}: DeleteMealServiceParams) {
   const meal = await mealsRepository.findById({ mealId, userId });
 
   if (!meal) {

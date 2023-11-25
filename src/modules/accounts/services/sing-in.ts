@@ -6,13 +6,17 @@ import auth from 'config/auth';
 import { ApiError } from 'shared/errors/api-error';
 import { usersRepository } from '../repositories/UsersRepository';
 
-interface SignInParams {
+interface SignInServiceParams {
   name: string;
   email: string;
   password: string;
 }
 
-export async function signInService({ name, email, password }: SignInParams) {
+export async function signInService({
+  name,
+  email,
+  password,
+}: SignInServiceParams) {
   const emailAlreadyInUse = await usersRepository.findByEmail({ email });
 
   if (emailAlreadyInUse) {

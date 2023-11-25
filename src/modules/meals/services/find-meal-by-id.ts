@@ -1,8 +1,8 @@
 import { ApiError } from 'shared/errors/api-error';
-import { mealsRepository } from '../repositories/MealsRepository';
 import { MealMapper } from '../mappers/meal-mapper';
+import { mealsRepository } from '../repositories/MealsRepository';
 
-interface FindMealByIdParams {
+interface FindMealByIdServiceParams {
   mealId: string;
   userId: string;
 }
@@ -10,7 +10,7 @@ interface FindMealByIdParams {
 export async function findMealByIdService({
   mealId,
   userId,
-}: FindMealByIdParams) {
+}: FindMealByIdServiceParams) {
   const meal = await mealsRepository.findById({ mealId, userId });
 
   if (!meal) {

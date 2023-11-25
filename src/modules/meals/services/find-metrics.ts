@@ -2,11 +2,13 @@ import { MealMetricsDTO } from '../dtos/meal.dto';
 import { Meal } from '../models/Meal';
 import { mealsRepository } from '../repositories/MealsRepository';
 
-interface FindMetricsParams {
+interface FindMetricsServiceParams {
   userId: string;
 }
 
-export async function findMealMetricsService({ userId }: FindMetricsParams) {
+export async function findMealMetricsService({
+  userId,
+}: FindMetricsServiceParams) {
   const meals = await mealsRepository.findAll({ userId });
 
   const mealsOnDiet = meals.filter((meals) => !!meals.isInDiet);

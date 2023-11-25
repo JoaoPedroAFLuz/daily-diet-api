@@ -6,7 +6,7 @@ import { env } from 'config/env';
 import { ApiError } from 'shared/errors/api-error';
 import { usersRepository } from '../repositories/UsersRepository';
 
-interface AuthenticateParams {
+interface AuthenticateServiceParams {
   email: string;
   password: string;
 }
@@ -14,7 +14,7 @@ interface AuthenticateParams {
 export async function authenticateService({
   email,
   password,
-}: AuthenticateParams) {
+}: AuthenticateServiceParams) {
   const user = await usersRepository.findByEmail({ email });
 
   if (!user) {
