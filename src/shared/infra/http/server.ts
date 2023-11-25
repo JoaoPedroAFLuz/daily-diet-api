@@ -1,16 +1,5 @@
-import fastifyCookie from '@fastify/cookie';
-import fastify from 'fastify';
-
 import { env } from 'config/env';
-import { routes } from 'shared/infra/http/routes';
-import { errorHandler } from './middlewares/error-handler';
-
-const app = fastify();
-
-app.register(fastifyCookie);
-app.register(routes);
-
-errorHandler(app);
+import { app } from './app';
 
 app
   .listen({
