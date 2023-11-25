@@ -4,33 +4,37 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/shared/infra/http/server.ts",
     "knex": "node  --no-warnings --loader tsx ./node_modules/knex/bin/cli.js",
     "lint": "eslint src --ext .ts",
     "format": "prettier src --write",
-    "prepare": "husky install"
+    "build": "tsup ./src"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.9.4",
     "@typescript-eslint/eslint-plugin": "^6.12.0",
     "@typescript-eslint/parser": "^6.12.0",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "husky": "^8.0.3",
     "prettier": "^3.1.0",
     "tsx": "^3.12.2",
     "typescript": "^4.9.4"
   },
   "dependencies": {
     "@fastify/cookie": "^9.2.0",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.3.1",
     "fastify": "^4.24.3",
+    "jsonwebtoken": "^9.0.2",
     "knex": "^2.4.2",
     "sqlite3": "^5.1.6",
+    "tsup": "^8.0.1",
     "zod": "^3.22.4"
   }
 }

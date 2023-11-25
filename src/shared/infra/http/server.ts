@@ -1,15 +1,16 @@
 import fastifyCookie from '@fastify/cookie';
 import fastify from 'fastify';
 
-import { env } from './env';
-import { mealsRoutes } from './routes/meals';
+import { env } from 'config/env';
+import { routes } from 'shared/infra/http/routes';
+import { errorHandler } from './middlewares/error-handler';
 
 const app = fastify();
 
 app.register(fastifyCookie);
-app.register(mealsRoutes, {
-  prefix: '/meals',
-});
+app.register(routes);
+
+errorHandler(app);
 
 app
   .listen({
