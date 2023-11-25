@@ -5,8 +5,9 @@ import { deleteMealService } from 'modules/meals/services/delete-meal';
 import { findAllMealsService } from 'modules/meals/services/find-all-meals';
 import { findMealByIdService } from 'modules/meals/services/find-meal-by-id';
 import { findMealMetricsService } from 'modules/meals/services/find-metrics';
+import { updateMealService } from 'modules/meals/services/update-meal-service';
 import { checkAuthentication } from '../middlewares/check-authentication';
-import { createMealSchema } from '../schemas/create-meal-schema';
+import { mealInputSchema } from '../schemas/create-meal-schema';
 import { getMealParamsSchema } from '../schemas/get-meal-schema';
 
 export async function mealsRoutes(app: FastifyInstance) {
@@ -18,7 +19,7 @@ export async function mealsRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { id: userId } = request.user;
 
-      const { name, description, dateTime, isInDiet } = createMealSchema.parse(
+      const { name, description, dateTime, isInDiet } = mealInputSchema.parse(
         request.body,
       );
 
@@ -75,6 +76,33 @@ export async function mealsRoutes(app: FastifyInstance) {
       const mealMetrics = await findMealMetricsService({ userId });
 
       return reply.send({ mealMetrics });
+    },
+  );
+
+  app.put(
+    '/:id',
+    {
+      preHandler: [checkAuthentication],
+    },
+    async (request, reply) => {
+      const { id: userId } = request.user;
+
+      const { id: mealId } = getMealParamsSchema.parse(request.params);
+
+      const { name, description, dateTime, isInDiet } = mealInputSchema.parse(
+        request.body,
+      );
+
+      await updateMealService({
+        mealId,
+        userId,
+        name,
+        description,
+        dateTime,
+        isInDiet,
+      });
+
+      return reply.status(204).send();
     },
   );
 

@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export const createMealSchema = z.object({
+export const mealInputSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long'),
   description: z
     .string()
@@ -11,6 +11,6 @@ export const createMealSchema = z.object({
   }),
 });
 
-export type CreateMealDTO = z.infer<typeof createMealSchema> & {
+export type MealInputDTO = z.infer<typeof mealInputSchema> & {
   userId: string;
 };

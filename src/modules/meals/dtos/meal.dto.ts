@@ -6,6 +6,15 @@ export interface CreateMealDTO {
   isInDiet: boolean;
 }
 
+export interface UpdateMealDTO {
+  id: string;
+  userId: string;
+  name: string;
+  description: string;
+  dateTime: string;
+  isInDiet: boolean;
+}
+
 export interface MealDTO {
   id: string;
   name: string;
